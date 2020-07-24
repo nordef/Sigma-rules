@@ -1,0 +1,31 @@
+title: NewDriverFile-InRegistry
+id: 1
+status: experimental
+description: Hunting search for Root-kit technique. Driver files added under ControlSet001 or CurrentControlSet registry paths
+author: Anders Sand Frogner
+date: 2020/06/06
+references: 
+    - https://attack.mitre.org/techniques/T1014/
+tags:
+    - ttp.t1014
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4657
+    strings:
+        Operation_Type:
+            - 'New Registry Value Created'
+        Object_Value_Name:
+            - 'ImagePath'
+        New_Value|endswith:
+            .sys
+    regpaths:
+        Object_Name|contains:
+            - '*ControlSet001*'
+            - '*CurrentControlSet*'
+    condition: selection and strings and regpaths
+falsepositives:
+    - Legitimate applications use the same technique. Download and analyse the .sys file to determine if the file is malicious. Rule best used for hunting.
+level: medium
